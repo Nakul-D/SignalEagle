@@ -1,0 +1,149 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: SignalEagle development environment.
+
+Parameters:
+  AvailabilityZone:
+    Type: AWS::EC2::AvailabilityZone::Name
+    Description: The Availability Zone in which to launch the RDS instance.
+
+  DbInstanceIdentifier:
+    Type: String
+    Description: Identifier for the RDS instance.
+
+  DbUsername:
+    Type: String
+    Description: Master username for the RDS instance.
+
+  DbPassword:
+    Type: String
+    NoEcho: true
+    Description: Master password for the RDS instance.
+
+  DevDbName:
+    Type: String
+    Description: Name of development database.
+
+  Vpc:
+    Type: AWS::EC2::VPC::Id
+    Description: The ID of the VPC where resources will be deployed.
+
+  Subnets:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: List of subnet IDs (comma-separated) within the selected VPC.
+
+  DevBucketName:
+    Type: String
+    Description: Name of the development S3 bucket.
+    AllowedPattern: "^[a-z0-9.-]{3,63}$"
+    ConstraintDescription: Bucket name must be between 3 and 63 characters, lowercase letters, numbers, periods, or hyphens.
+
+  TestBucketName:
+    Type: String
+    Description: Name of the testing S3 bucket.
+    AllowedPattern: "^[a-z0-9.-]{3,63}$"
+    ConstraintDescription: Bucket name must be between 3 and 63 characters, lowercase letters, numbers, periods, or hyphens.
+
+Resources:
+  SignalEagleDevDbSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow PostgreSQL (5432) inbound from anywhere, outbound all.
+      VpcId: !Ref Vpc
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 5432
+          ToPort: 5432
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+
+  SignalEagleDevDbSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: Subnets for SignalEagle Dev RDS.
+      SubnetIds: !Ref Subnets
+
+  SignalEagleDevParameterGroup:
+    Type: AWS::RDS::DBParameterGroup
+    Properties:
+      Family: postgres17
+      Description: Force SSL connections.
+      Parameters:
+        rds.force_ssl: "1"
+
+  SignalEagleDevRdsInstance:
+    Type: AWS::RDS::DBInstance
+    DeletionPolicy: Delete
+    Properties:
+      DBInstanceIdentifier: !Ref DbInstanceIdentifier
+      DBName: !Ref DevDbName
+      Engine: postgres
+      EngineVersion: 17.4
+      DBInstanceClass: db.t3.micro
+      AllocatedStorage: 20
+      StorageType: gp3
+      PubliclyAccessible: true
+      MasterUsername: !Ref DbUsername
+      MasterUserPassword: !Ref DbPassword
+      MultiAZ: false
+      AutoMinorVersionUpgrade: true
+      DeletionProtection: false
+      BackupRetentionPeriod: 0
+      VPCSecurityGroups:
+        - !Ref SignalEagleDevDbSecurityGroup
+      DBSubnetGroupName: !Ref SignalEagleDevDbSubnetGroup
+      Port: 5432
+      EnableIAMDatabaseAuthentication: false
+      StorageEncrypted: true
+      KmsKeyId: alias/aws/rds
+      MonitoringInterval: 0
+      EnableCloudwatchLogsExports: []
+      DBParameterGroupName: !Ref SignalEagleDevParameterGroup
+      OptionGroupName: default:postgres-17
+      AvailabilityZone: !Ref AvailabilityZone
+
+  SignalEagleDevBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Delete
+    Properties:
+      BucketName: !Ref DevBucketName
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        IgnorePublicAcls: true
+        BlockPublicPolicy: true
+        RestrictPublicBuckets: true
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+
+  SignalEagleTestBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Delete
+    Properties:
+      BucketName: !Ref TestBucketName
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        IgnorePublicAcls: true
+        BlockPublicPolicy: true
+        RestrictPublicBuckets: true
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+
+Outputs:
+  RdsInstanceEndpoint:
+    Description: Endpoint address of the created RDS instance.
+    Value: !GetAtt SignalEagleDevRdsInstance.Endpoint.Address
+
+  RdsInstancePort:
+    Description: Database port of the created RDS instance.
+    Value: !GetAtt SignalEagleDevRdsInstance.Endpoint.Port
