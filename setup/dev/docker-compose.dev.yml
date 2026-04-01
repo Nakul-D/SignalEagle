@@ -1,0 +1,25 @@
+services:
+  api-server:
+    container_name: api-server
+    build:
+      context: ../../backend
+      dockerfile: docker/Dockerfile.dev
+    working_dir: /SignalEagle
+    environment:
+      STAGE: dev
+      AWS_REGION: ${REGION}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      S3_BUCKET_NAME: ${DEV_BUCKET_NAME}
+      DB_HOST: ${RDS_ENDPOINT}
+      DB_USER: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DEV_DB_NAME}
+      DB_PORT: ${RDS_PORT}
+      DB_SSLMODE: ${DB_SSL_MODE}
+      JWT_SECRET_KEY: supersecretkey123
+      TOKEN_EXPIRES_IN_HOURS: 1
+    ports:
+      - "3000:3000"
+    volumes:
+      - ../../backend/app:/SignalEagle
