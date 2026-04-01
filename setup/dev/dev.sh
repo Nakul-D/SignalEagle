@@ -178,11 +178,13 @@ up() {
 
 start() {
     echo "Starting docker container..."
+    docker compose -f docker-compose.dev.yml -p signaleagle-dev up -d
     echo "Done!"
 }
 
 stop() {
     echo "Stopping docker container..."
+    docker compose -f docker-compose.dev.yml -p signaleagle-dev down
     echo "Done!"
 }
 

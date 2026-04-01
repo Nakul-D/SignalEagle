@@ -1,0 +1,29 @@
+FROM golang:1.26.1-alpine3.22
+
+RUN go install github.com/air-verse/air@v1.64.5
+
+WORKDIR /SignalEagle
+
+COPY ../app/go.mod ../app/go.sum ./
+
+RUN go mod download
+
+COPY ../app ./
+
+ENV STAGE \
+    AWS_REGION \
+    AWS_ACCESS_KEY_ID \
+    AWS_SECRET_ACCESS_KEY \
+    S3_BUCKET_NAME \
+    DB_HOST \
+    DB_USER \
+    DB_PASSWORD \
+    DB_NAME \
+    DB_PORT \
+    DB_SSLMODE \
+    JWT_SECRET_KEY \
+    TOKEN_EXPIRES_IN_HOURS
+
+EXPOSE 3000
+
+CMD ["air"]
