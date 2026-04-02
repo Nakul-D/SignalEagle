@@ -1,18 +1,22 @@
 package main
 
 import (
-	"log"
+	"log/slog"
+	"os"
 
-	"github.com/gofiber/fiber/v3"
+	"github.com/Nakul-D/SignalEagle/start"
 )
 
 func main() {
 
-	app := fiber.New()
+	// Global setting for logging
+	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stdout, nil)))
 
-	app.Get("/", func(c fiber.Ctx) error {
-		return c.SendString("Hello, World!")
-	})
-
-	log.Fatal(app.Listen(":3000"))
+	// Starting server
+	server := start.Server()
+	err := server.Listen(":3000")
+	if err != nil {
+		slog.Error("failed to start server", "error", err)
+		os.Exit(1)
+	}
 }
