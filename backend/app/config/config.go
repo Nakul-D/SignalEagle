@@ -11,7 +11,6 @@ type Config struct {
 	AwsRegion           string
 	AwsAccessKeyID      string // Don't set in prod, will be inferred from IAM
 	AwsSecretAccessKey  string // Don't set in prod, will be inferred from IAM
-	S3BucketName        string
 	DbHost              string
 	DbUser              string
 	DbPassword          string
@@ -43,10 +42,6 @@ func LoadConfig() (*Config, error) {
 		if cfg.AwsSecretAccessKey, ok = os.LookupEnv("AWS_SECRET_ACCESS_KEY"); !ok {
 			return nil, fmt.Errorf("missing AWS_SECRET_ACCESS_KEY")
 		}
-	}
-
-	if cfg.S3BucketName, ok = os.LookupEnv("S3_BUCKET_NAME"); !ok {
-		return nil, fmt.Errorf("missing S3_BUCKET_NAME")
 	}
 
 	if cfg.DbHost, ok = os.LookupEnv("DB_HOST"); !ok {

@@ -123,9 +123,6 @@ setup() {
     echo "CF_ROLE_ARN=$CF_ROLE_ARN" >> .env
 
     echo "STACK_NAME=signaleagle-dev-stack" >> .env
-    TIMESTAMP=$(date +%s)
-    echo "DEV_BUCKET_NAME=signaleagle-dev-$TIMESTAMP" >> .env
-    echo "TEST_BUCKET_NAME=signaleagle-test-$TIMESTAMP" >> .env
     echo "DB_INSTANCE_IDENTIFIER=signaleagle-dev-instance" >> .env
 	echo "DB_USERNAME=postgres" >> .env
 	echo "DB_PASSWORD=signaleagle-postgres-123" >> .env
@@ -153,8 +150,6 @@ up() {
             DevDbName="$DEV_DB_NAME" \
             DbUsername="$DB_USERNAME" \
             DbPassword="$DB_PASSWORD" \
-            DevBucketName="$DEV_BUCKET_NAME" \
-            TestBucketName="$TEST_BUCKET_NAME" \
         --no-cli-pager
 
     RDS_ENDPOINT=$(aws cloudformation describe-stacks \
@@ -197,9 +192,6 @@ down() {
     echo "Removing deployed AWS resources..."
 
     load_env
-
-    aws s3 rm s3://$DEV_BUCKET_NAME --recursive --region "$REGION" || true
-    aws s3 rm s3://$TEST_BUCKET_NAME --recursive --region "$REGION" || true
 
     aws cloudformation delete-stack \
         --stack-name "$STACK_NAME" \

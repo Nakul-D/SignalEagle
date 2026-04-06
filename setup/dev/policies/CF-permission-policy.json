@@ -4,7 +4,7 @@
     {
       "Sid": "AllowFullAccessToRequiredResources",
       "Effect": "Allow",
-      "Action": ["ec2:*", "rds:*", "s3:*"],
+      "Action": ["ec2:*", "rds:*"],
       "Resource": "*"
     }
   ]
