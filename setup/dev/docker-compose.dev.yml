@@ -1,6 +1,20 @@
 services:
+
+  migrate:
+    container_name: migrate
+    image: migrate/migrate:v4.19.1
+    volumes:
+      - ../../database/migrations:/migrations
+    command: >
+      -path=/migrations
+      -database postgresql://${DB_USERNAME}:${DB_PASSWORD}@${RDS_ENDPOINT}:${RDS_PORT}/${DEV_DB_NAME}?sslmode=${DB_SSL_MODE}
+      up
+
   api-server:
     container_name: api-server
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
     build:
       context: ../../backend
       dockerfile: docker/Dockerfile.dev
