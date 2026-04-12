@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/Nakul-D/SignalEagle/config"
-	"github.com/Nakul-D/SignalEagle/database"
+	"github.com/Nakul-D/SignalEagle/database/rds"
 	"github.com/gofiber/fiber/v3"
 	"gorm.io/gorm"
 )
@@ -25,16 +25,16 @@ func Server() *fiber.App {
 	}
 
 	// Connecting to database
-	db, err := database.ConnectToDB(cfg.DbHost, cfg.DbUser, cfg.DbPassword, cfg.DbName, cfg.DbPort, cfg.DbSslMode)
+	rdsDB, err := rds.ConnectToRds(cfg.RdsHost, cfg.RdsUser, cfg.RdsPassword, cfg.RdsName, cfg.RdsPort, cfg.RdsSslMode)
 	if err != nil {
-		slog.Error("failed to connect to database", "error", err)
+		slog.Error("failed to connect to RDS", "error", err)
 		os.Exit(1)
 	}
 
-	return BuildApp(*cfg, db)
+	return BuildApp(*cfg, rdsDB)
 }
 
-func BuildApp(cfg config.Config, db *gorm.DB) *fiber.App {
+func BuildApp(cfg config.Config, rdsDB *gorm.DB) *fiber.App {
 
 	app := fiber.New()
 

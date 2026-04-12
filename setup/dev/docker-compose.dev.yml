@@ -4,10 +4,10 @@ services:
     container_name: migrate
     image: migrate/migrate:v4.19.1
     volumes:
-      - ../../database/migrations:/migrations
+      - ../../database/rds/migrations:/migrations
     command: >
       -path=/migrations
-      -database postgresql://${DB_USERNAME}:${DB_PASSWORD}@${RDS_ENDPOINT}:${RDS_PORT}/${DEV_DB_NAME}?sslmode=${DB_SSL_MODE}
+      -database postgresql://${RDS_USERNAME}:${RDS_PASSWORD}@${RDS_ENDPOINT}:${RDS_PORT}/${DEV_RDS_NAME}?sslmode=${RDS_SSL_MODE}
       up
 
   api-server:
@@ -24,12 +24,12 @@ services:
       AWS_REGION: ${REGION}
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
-      DB_HOST: ${RDS_ENDPOINT}
-      DB_USER: ${DB_USERNAME}
-      DB_PASSWORD: ${DB_PASSWORD}
-      DB_NAME: ${DEV_DB_NAME}
-      DB_PORT: ${RDS_PORT}
-      DB_SSLMODE: ${DB_SSL_MODE}
+      RDS_HOST: ${RDS_ENDPOINT}
+      RDS_USER: ${RDS_USERNAME}
+      RDS_PASSWORD: ${RDS_PASSWORD}
+      RDS_NAME: ${DEV_RDS_NAME}
+      RDS_PORT: ${RDS_PORT}
+      RDS_SSL_MODE: ${RDS_SSL_MODE}
       JWT_SECRET_KEY: supersecretkey123
       TOKEN_EXPIRES_IN_HOURS: 1
     ports:

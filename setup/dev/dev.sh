@@ -123,11 +123,11 @@ setup() {
     echo "CF_ROLE_ARN=$CF_ROLE_ARN" >> .env
 
     echo "STACK_NAME=signaleagle-dev-stack" >> .env
-    echo "DB_INSTANCE_IDENTIFIER=signaleagle-dev-instance" >> .env
-	echo "DB_USERNAME=postgres" >> .env
-	echo "DB_PASSWORD=signaleagle-postgres-123" >> .env
-    echo "DEV_DB_NAME=signaleagle_dev_db" >> .env
-    echo "TEST_DB_NAME=signaleagle_test_db" >> .env
+    echo "RDS_INSTANCE_IDENTIFIER=signaleagle-dev-instance" >> .env
+	echo "RDS_USERNAME=postgres" >> .env
+	echo "RDS_PASSWORD=signaleagle-postgres-123" >> .env
+    echo "DEV_RDS_NAME=signaleagle_dev_db" >> .env
+    echo "TEST_RDS_NAME=signaleagle_test_db" >> .env
 
     echo "Setup complete! Environment variables written to .env"
 }
@@ -146,10 +146,10 @@ up() {
             AvailabilityZone="$AZ" \
             Vpc="$VPC_ID" \
             Subnets="$SUBNET_IDS" \
-            DbInstanceIdentifier="$DB_INSTANCE_IDENTIFIER" \
-            DevDbName="$DEV_DB_NAME" \
-            DbUsername="$DB_USERNAME" \
-            DbPassword="$DB_PASSWORD" \
+            RdsInstanceIdentifier="$RDS_INSTANCE_IDENTIFIER" \
+            DevRdsName="$DEV_RDS_NAME" \
+            RdsUsername="$RDS_USERNAME" \
+            RdsPassword="$RDS_PASSWORD" \
         --no-cli-pager
 
     RDS_ENDPOINT=$(aws cloudformation describe-stacks \
@@ -166,7 +166,7 @@ up() {
 
     update_env RDS_ENDPOINT "$RDS_ENDPOINT"
     update_env RDS_PORT "$RDS_PORT"
-    update_env DB_SSL_MODE "require"
+    update_env RDS_SSL_MODE "require"
 
     echo "AWS resources deployed!"
 }
@@ -206,7 +206,7 @@ down() {
 
     update_env RDS_ENDPOINT ""
     update_env RDS_PORT ""
-    update_env DB_SSL_MODE ""
+    update_env RDS_SSL_MODE ""
 
     echo "Removed deployed AWS resources."
 }

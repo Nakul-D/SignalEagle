@@ -6,20 +6,20 @@ Parameters:
     Type: AWS::EC2::AvailabilityZone::Name
     Description: The Availability Zone in which to launch the RDS instance.
 
-  DbInstanceIdentifier:
+  RdsInstanceIdentifier:
     Type: String
     Description: Identifier for the RDS instance.
 
-  DbUsername:
+  RdsUsername:
     Type: String
     Description: Master username for the RDS instance.
 
-  DbPassword:
+  RdsPassword:
     Type: String
     NoEcho: true
     Description: Master password for the RDS instance.
 
-  DevDbName:
+  DevRdsName:
     Type: String
     Description: Name of development database.
 
@@ -32,7 +32,7 @@ Parameters:
     Description: List of subnet IDs (comma-separated) within the selected VPC.
 
 Resources:
-  SignalEagleDevDbSecurityGroup:
+  SignalEagleDevRdsSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Allow PostgreSQL (5432) inbound from anywhere, outbound all.
@@ -46,13 +46,13 @@ Resources:
         - IpProtocol: -1
           CidrIp: 0.0.0.0/0
 
-  SignalEagleDevDbSubnetGroup:
+  SignalEagleDevRdsSubnetGroup:
     Type: AWS::RDS::DBSubnetGroup
     Properties:
       DBSubnetGroupDescription: Subnets for SignalEagle Dev RDS.
       SubnetIds: !Ref Subnets
 
-  SignalEagleDevParameterGroup:
+  SignalEagleDevRdsParameterGroup:
     Type: AWS::RDS::DBParameterGroup
     Properties:
       Family: postgres17
@@ -64,30 +64,30 @@ Resources:
     Type: AWS::RDS::DBInstance
     DeletionPolicy: Delete
     Properties:
-      DBInstanceIdentifier: !Ref DbInstanceIdentifier
-      DBName: !Ref DevDbName
+      DBInstanceIdentifier: !Ref RdsInstanceIdentifier
+      DBName: !Ref DevRdsName
       Engine: postgres
       EngineVersion: 17.4
       DBInstanceClass: db.t3.micro
       AllocatedStorage: 20
       StorageType: gp3
       PubliclyAccessible: true
-      MasterUsername: !Ref DbUsername
-      MasterUserPassword: !Ref DbPassword
+      MasterUsername: !Ref RdsUsername
+      MasterUserPassword: !Ref RdsPassword
       MultiAZ: false
       AutoMinorVersionUpgrade: true
       DeletionProtection: false
       BackupRetentionPeriod: 0
       VPCSecurityGroups:
-        - !Ref SignalEagleDevDbSecurityGroup
-      DBSubnetGroupName: !Ref SignalEagleDevDbSubnetGroup
+        - !Ref SignalEagleDevRdsSecurityGroup
+      DBSubnetGroupName: !Ref SignalEagleDevRdsSubnetGroup
       Port: 5432
       EnableIAMDatabaseAuthentication: false
       StorageEncrypted: true
       KmsKeyId: alias/aws/rds
       MonitoringInterval: 0
       EnableCloudwatchLogsExports: []
-      DBParameterGroupName: !Ref SignalEagleDevParameterGroup
+      DBParameterGroupName: !Ref SignalEagleDevRdsParameterGroup
       OptionGroupName: default:postgres-17
       AvailabilityZone: !Ref AvailabilityZone
 

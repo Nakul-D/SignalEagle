@@ -11,12 +11,12 @@ type Config struct {
 	AwsRegion           string
 	AwsAccessKeyID      string // Don't set in prod, will be inferred from IAM
 	AwsSecretAccessKey  string // Don't set in prod, will be inferred from IAM
-	DbHost              string
-	DbUser              string
-	DbPassword          string
-	DbName              string
-	DbPort              string
-	DbSslMode           string
+	RdsHost             string
+	RdsUser             string
+	RdsPassword         string
+	RdsName             string
+	RdsPort             string
+	RdsSslMode          string
 	JwtSecretKey        string
 	TokenExpiresInHours int
 }
@@ -44,28 +44,28 @@ func LoadConfig() (*Config, error) {
 		}
 	}
 
-	if cfg.DbHost, ok = os.LookupEnv("DB_HOST"); !ok {
-		return nil, fmt.Errorf("missing DB_HOST")
+	if cfg.RdsHost, ok = os.LookupEnv("RDS_HOST"); !ok {
+		return nil, fmt.Errorf("missing RDS_HOST")
 	}
 
-	if cfg.DbUser, ok = os.LookupEnv("DB_USER"); !ok {
-		return nil, fmt.Errorf("missing DB_USER")
+	if cfg.RdsUser, ok = os.LookupEnv("RDS_USER"); !ok {
+		return nil, fmt.Errorf("missing RDS_USER")
 	}
 
-	if cfg.DbPassword, ok = os.LookupEnv("DB_PASSWORD"); !ok {
-		return nil, fmt.Errorf("missing DB_PASSWORD")
+	if cfg.RdsPassword, ok = os.LookupEnv("RDS_PASSWORD"); !ok {
+		return nil, fmt.Errorf("missing RDS_PASSWORD")
 	}
 
-	if cfg.DbName, ok = os.LookupEnv("DB_NAME"); !ok {
-		return nil, fmt.Errorf("missing DB_NAME")
+	if cfg.RdsName, ok = os.LookupEnv("RDS_NAME"); !ok {
+		return nil, fmt.Errorf("missing RDS_NAME")
 	}
 
-	if cfg.DbPort, ok = os.LookupEnv("DB_PORT"); !ok {
-		return nil, fmt.Errorf("missing DB_PORT")
+	if cfg.RdsPort, ok = os.LookupEnv("RDS_PORT"); !ok {
+		return nil, fmt.Errorf("missing RDS_PORT")
 	}
 
-	if cfg.DbSslMode, ok = os.LookupEnv("DB_SSLMODE"); !ok {
-		return nil, fmt.Errorf("missing DB_SSLMODE")
+	if cfg.RdsSslMode, ok = os.LookupEnv("RDS_SSL_MODE"); !ok {
+		return nil, fmt.Errorf("missing RDS_SSL_MODE")
 	}
 
 	if cfg.JwtSecretKey, ok = os.LookupEnv("JWT_SECRET_KEY"); !ok {

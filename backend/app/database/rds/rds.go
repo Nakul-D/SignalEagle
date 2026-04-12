@@ -1,4 +1,4 @@
-package database
+package rds
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-func ConnectToDB(host, user, password, dbName, port, sslMode string) (*gorm.DB, error) {
+func ConnectToRds(host, user, password, dbName, port, sslMode string) (*gorm.DB, error) {
 
 	dsn := fmt.Sprintf(
 		"host=%s user=%s password=%s dbname=%s port=%s sslmode=%s",
@@ -39,7 +39,7 @@ func ping(db *gorm.DB) error {
 
 	err = sqlDB.Ping()
 	if err != nil {
-		return fmt.Errorf("failed to ping database: %w", err)
+		return fmt.Errorf("failed to ping RDS: %w", err)
 	}
 
 	return nil
